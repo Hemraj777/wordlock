@@ -1,5 +1,7 @@
 package com.wordlock
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -14,19 +16,23 @@ class MainActivity : AppCompatActivity() {
 
         refreshWord()
 
-        findViewById<Button>(R.id.newWordBtn).setOnClickListener {
-            WordWidgetProvider.updateAllWidgets(this)
-            refreshWord()
-            Toast.makeText(this, "Widget updated!", Toast.LENGTH_SHORT).show()
+        findViewById<Button>(R.id.startOverlayBtn).setOnClickListener {
+            val serviceIntent = Intent(this, WordOverlayService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent)
+            } else {
+                startService(serviceIntent)
+            }
+            Toast.makeText(this, "Overlay started! New word on each screen unlock.", Toast.LENGTH_LONG).show()
         }
 
-        findViewById<Button>(R.id.startOverlayBtn).setOnClickListener {
-            Toast.makeText(this, "Long-press home screen → Widgets → WordLock", Toast.LENGTH_LONG).show()
+        findViewById<Button>(R.id.newWordBtn).setOnClickListener {
+            refreshWord()
         }
     }
 
     private fun refreshWord() {
-        val dw = WordProvider.getDailyWord(this)
+        val dw = WordProvider.getRandomWord(this)
         findViewById<TextView>(R.id.wordText).text = dw.word
         findViewById<TextView>(R.id.meaningText).text = dw.meaning
         findViewById<TextView>(R.id.meaningNPText).text = dw.meaningNP
