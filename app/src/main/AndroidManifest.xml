@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher_foreground"
-        android:label="WordLock"
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.WordLock">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:showWhenLocked="true"
             android:theme="@style/Theme.WordLock">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,17 +19,16 @@
         </activity>
 
         <service
-            android:name=".WordOverlayService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse" />
-
-        <receiver
-            android:name=".BootReceiver"
-            android:exported="true">
+            android:name=".WordWallpaperService"
+            android:exported="true"
+            android:permission="android.permission.BIND_WALLPAPER">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.service.wallpaper.WallpaperService" />
             </intent-filter>
-        </receiver>
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/word_wallpaper" />
+        </service>
 
     </application>
 </manifest>

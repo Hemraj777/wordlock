@@ -8,6 +8,16 @@
     android:padding="40dp">
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="WORDLOCK"
+        android:textColor="#A855F7"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.2" />
+
+    <TextView
         android:id="@+id/wordText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,7 +29,7 @@
         android:id="@+id/meaningText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:textColor="#9ca3af"
         android:textSize="16sp" />
 
@@ -27,7 +37,7 @@
         android:id="@+id/meaningNPText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="6dp"
         android:textColor="#a5b4fc"
         android:textSize="15sp"
         android:textStyle="bold" />
@@ -38,7 +48,7 @@
         android:layout_height="56dp"
         android:layout_marginTop="48dp"
         android:background="@drawable/btn_primary"
-        android:text="Enable Lock Screen Notification"
+        android:text="Set as Lock Screen Wallpaper"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16sp" />
@@ -49,9 +59,18 @@
         android:layout_height="56dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/btn_outline"
-        android:text="New Word"
+        android:text="Preview New Word"
         android:textAllCaps="false"
         android:textColor="#e8e8ed"
         android:textSize="16sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Tip: Long-press the home screen → Wallpapers →\nLive Wallpapers → WordLock"
+        android:textColor="#4B5563"
+        android:textSize="12sp"
+        android:gravity="center" />
 
 </LinearLayout>
