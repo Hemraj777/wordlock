@@ -48,7 +48,7 @@
         android:layout_height="56dp"
         android:layout_marginTop="48dp"
         android:background="@drawable/btn_primary"
-        android:text="Set as Lock Screen Wallpaper"
+        android:text="Enable Lock Screen Words"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16sp" />
@@ -63,14 +63,5 @@
         android:textAllCaps="false"
         android:textColor="#e8e8ed"
         android:textSize="16sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Tip: Long-press the home screen → Wallpapers →\nLive Wallpapers → WordLock"
-        android:textColor="#4B5563"
-        android:textSize="12sp"
-        android:gravity="center" />
 
 </LinearLayout>
