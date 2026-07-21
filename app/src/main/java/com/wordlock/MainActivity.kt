@@ -21,17 +21,14 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.startOverlayBtn).setOnClickListener {
             try {
-                val intent = Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_PICKER)
-                startActivity(intent)
-                Toast.makeText(this, "Select WordLock wallpaper", Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                // Fallback: open wallpaper settings
-                try {
-                    val intent = Intent("android.service.wallpaper.WallpaperService")
-                    startActivity(intent)
-                } catch (e2: Exception) {
-                    Toast.makeText(this, "Go to Settings → Display → Wallpaper → Live Wallpapers → WordLock", Toast.LENGTH_LONG).show()
+                val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
+                    putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                        android.content.ComponentName(this@MainActivity, WordWallpaperService::class.java))
                 }
+                startActivity(intent)
+                Toast.makeText(this, "Tap 'Set wallpaper'", Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Go to Settings → Display → Wallpaper → Live Wallpapers → WordLock", Toast.LENGTH_LONG).show()
             }
         }
 
