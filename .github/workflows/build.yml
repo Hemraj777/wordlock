@@ -28,14 +28,25 @@ jobs:
         gradle-version: '8.5'
         validate-wrappers: false
 
-    - name: Build Release APK
+    - name: Generate Keystore
+      run: |
+        keytool -genkeypair -v \
+          -keystore app/wordlock.keystore \
+          -alias wordlock \
+          -keyalg RSA -keysize 2048 \
+          -validity 10000 \
+          -storepass wordlock123 \
+          -keypass wordlock123 \
+          -dname "CN=Hemraz777, OU=Dev, O=WordLock, L=Kathmandu, ST=Bagmati, C=NP"
+
+    - name: Build Signed APK
       run: gradle assembleRelease --no-daemon
 
     - name: Upload APK as artifact
       uses: actions/upload-artifact@v4
       with:
         name: wordlock-apk
-        path: app/build/outputs/apk/release/app-release-unsigned.apk
+        path: app/build/outputs/apk/release/app-release.apk
         if-no-files-found: error
 
     - name: Create Release
@@ -54,7 +65,7 @@ jobs:
           3. Open WordLock and tap "Enable Lock Screen Notification"
           4. Grant notification permission
           5. New word appears on your lock screen every day!
-        files: app/build/outputs/apk/release/app-release-unsigned.apk
+        files: app/build/outputs/apk/release/app-release.apk
         draft: false
         prerelease: false
       env:
