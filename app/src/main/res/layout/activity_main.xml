@@ -48,7 +48,7 @@
         android:layout_height="56dp"
         android:layout_marginTop="48dp"
         android:background="@drawable/btn_primary"
-        android:text="Enable Lock Screen Words"
+        android:text="Add Widget to Lock Screen"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16sp" />
@@ -59,7 +59,7 @@
         android:layout_height="56dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/btn_outline"
-        android:text="Preview New Word"
+        android:text="Refresh Widget Now"
         android:textAllCaps="false"
         android:textColor="#e8e8ed"
         android:textSize="16sp" />
