@@ -23,9 +23,10 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: '8.5'
+        validate-wrappers: false
 
     - name: Build Release APK
-      run: gradle assembleRelease
+      run: gradle assembleRelease --no-daemon
 
     - name: Upload APK as artifact
       uses: actions/upload-artifact@v4
@@ -41,14 +42,14 @@ jobs:
         tag_name: v1.0.0
         name: WordLock v1.0.0
         body: |
-          # WordLock 🔤
+          # WordLock
           
           A daily vocabulary builder that shows a new English word and its Nepali meaning on your lock screen.
           
           ## Installation
           1. Download the APK below
           2. Install on your Android phone
-          3. Open WordLock → tap "Enable Lock Screen Notification"
+          3. Open WordLock and tap "Enable Lock Screen Notification"
           4. Grant notification permission
           5. New word appears on your lock screen every day!
         files: app/build/outputs/apk/release/app-release-unsigned.apk
