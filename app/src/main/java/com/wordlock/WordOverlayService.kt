@@ -33,7 +33,7 @@ class WordOverlayService : Service() {
                 Notification.BigTextStyle()
                     .bigText("${word.meaning}\n\n${word.meaningNP}\n\n${word.example}")
             )
-            .setSmallIcon(android.R.drawable.ic_menu_info)
+            .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setContentIntent(openPendingIntent)
             .build()
