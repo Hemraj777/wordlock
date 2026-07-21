@@ -18,7 +18,7 @@ class WordWatchService : Service() {
         createChannel()
 
         val notification = Notification.Builder(this, "wl_channel")
-            .setContentTitle("WordLock is active")
+            .setContentTitle("WordLock active")
             .setContentText("New word on every screen unlock")
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
@@ -26,10 +26,7 @@ class WordWatchService : Service() {
         startForeground(999, notification)
 
         receiver = ScreenReceiver()
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-        }
+        val filter = IntentFilter(Intent.ACTION_SCREEN_ON)
         registerReceiver(receiver, filter)
     }
 
@@ -41,7 +38,7 @@ class WordWatchService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun createChannel() {
-        val ch = NotificationChannel("wl_channel", "WordLock", NotificationManager.IMPORTANCE_LOW)
+        val ch = NotificationChannel("wl_channel", "WordLock Service", NotificationManager.IMPORTANCE_LOW)
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.createNotificationChannel(ch)
     }
