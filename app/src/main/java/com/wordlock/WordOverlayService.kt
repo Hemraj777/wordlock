@@ -1,6 +1,5 @@
 package com.wordlock
 
-import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
@@ -12,7 +11,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
@@ -27,6 +25,7 @@ import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 
 class WordOverlayService : Service() {
 
@@ -48,7 +47,12 @@ class WordOverlayService : Service() {
             .build()
         startForeground(NOTIFICATION_ID, notification)
         registerReceivers()
-        Log.d("WordLock", "Overlay service started")
+
+        val hasPerm = Settings.canDrawOverlays(this)
+        Log.d("WordLock", "Service created. Overlay permission: $hasPerm")
+        handler.post {
+            Toast.makeText(this, "WordLock service started. Overlay permission: $hasPerm", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -61,11 +65,23 @@ class WordOverlayService : Service() {
         screenReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == Intent.ACTION_SCREEN_ON) {
-                    if (!Settings.canDrawOverlays(context)) {
-                        Log.d("WordLock", "No overlay permission, skipping")
+                    val hasPerm = Settings.canDrawOverlays(context)
+                    Log.d("WordLock", "SCREEN_ON fired. Overlay permission: $hasPerm")
+                    if (!hasPerm) {
+                        handler.post {
+                            Toast.makeText(context, "WordLock: No overlay permission!", Toast.LENGTH_SHORT).show()
+                        }
                         return
                     }
-                    handler.post { showOverlay() }
+                    handler.post {
+                        try {
+                            showOverlay()
+                            Log.d("WordLock", "Overlay shown successfully")
+                        } catch (e: Exception) {
+                            Log.e("WordLock", "Failed to show overlay: ${e.message}")
+                            Toast.makeText(context, "WordLock overlay error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }
@@ -73,6 +89,7 @@ class WordOverlayService : Service() {
         unlockReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == Intent.ACTION_USER_PRESENT) {
+                    Log.d("WordLock", "USER_PRESENT fired, removing overlay")
                     handler.post { removeOverlay() }
                 }
             }
@@ -94,16 +111,22 @@ class WordOverlayService : Service() {
         removeOverlay()
 
         val word = WordProvider.getRandomWord(this)
-
         val screenWidth = resources.displayMetrics.widthPixels
         val cardWidth = (screenWidth * 0.82).toInt()
 
         val card = createPaperCard(word, cardWidth)
 
+        val overlayType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        } else {
+            @Suppress("DEPRECATION")
+            WindowManager.LayoutParams.TYPE_PHONE
+        }
+
         val params = WindowManager.LayoutParams(
             cardWidth,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            overlayType,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT
@@ -114,6 +137,7 @@ class WordOverlayService : Service() {
 
         currentOverlay = card
         wm?.addView(card, params)
+        Log.d("WordLock", "View added to WindowManager for: ${word.word}")
 
         card.post {
             val cardHeight = card.height
@@ -129,15 +153,13 @@ class WordOverlayService : Service() {
                 }
             })
             fallAnim.start()
+            Log.d("WordLock", "Animation started")
         }
 
         card.setOnClickListener { removeOverlay() }
-        Log.d("WordLock", "Overlay shown: ${word.word}")
     }
 
     private fun createPaperCard(word: Word, width: Int): View {
-        val density = resources.displayMetrics.density
-
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(24), dp(20), dp(24), dp(20))
@@ -198,7 +220,6 @@ class WordOverlayService : Service() {
             setTextColor(0xFF374151.toInt())
             textSize = 13f
             gravity = Gravity.CENTER
-            lineHeight = dp(4)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -234,7 +255,6 @@ class WordOverlayService : Service() {
             typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.ITALIC)
             gravity = Gravity.CENTER
             setPadding(dp(12), 0, dp(12), 0)
-            lineHeight = dp(3)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -255,7 +275,12 @@ class WordOverlayService : Service() {
 
     private fun removeOverlay() {
         currentOverlay?.let {
-            try { wm?.removeView(it) } catch (_: Exception) {}
+            try {
+                wm?.removeView(it)
+                Log.d("WordLock", "Overlay removed")
+            } catch (e: Exception) {
+                Log.e("WordLock", "Error removing overlay: ${e.message}")
+            }
             currentOverlay = null
         }
     }
