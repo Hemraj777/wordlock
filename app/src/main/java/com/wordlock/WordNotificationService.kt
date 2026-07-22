@@ -80,12 +80,7 @@ class WordNotificationService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val contentText = "${word.meaning}\n${word.meaningNP}"
-
         val fullText = buildString {
-            appendLine(word.word)
-            appendLine(word.pronunciation)
-            appendLine()
             appendLine(word.meaning)
             appendLine()
             appendLine(word.meaningNP)
@@ -94,13 +89,13 @@ class WordNotificationService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(word.word)
-            .setContentText(contentText)
-            .setSubText(word.category.uppercase())
+            .setContentText(word.meaningNP)
+            .setSubText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
             .setStyle(
                 NotificationCompat.BigTextStyle()
                     .bigText(fullText)
-                    .setBigContentTitle("${word.word}  ${word.pronunciation}")
-                    .setSummaryText("${word.category.uppercase()} \u2022 New word today")
+                    .setBigContentTitle(word.word)
+                    .setSummaryText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
             )
             .setContentIntent(pendingIntent)
             .setOngoing(true)
