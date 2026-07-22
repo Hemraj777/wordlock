@@ -4,7 +4,47 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Open book left page -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M30,40 L38,40 L45,72 L54,72 L61,40 L69,40 L56,80 L43,80 Z"/>
+        android:pathData="M30,35 L52,32 L52,78 L30,78 Z" />
+
+    <!-- Open book right page -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M56,32 L78,35 L78,78 L56,78 Z" />
+
+    <!-- Book spine -->
+    <path
+        android:fillColor="#C084FC"
+        android:pathData="M52,30 L56,30 L56,80 L52,80 Z" />
+
+    <!-- Text lines on left page -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M35,42 L48,42 L48,44 L35,44 Z" />
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M35,48 L48,48 L48,50 L35,50 Z" />
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M35,54 L45,54 L45,56 L35,56 Z" />
+
+    <!-- Text lines on right page -->
+    <path
+        android:fillColor="#9CA3AF"
+        android:pathData="M60,42 L73,42 L73,44 L60,44 Z" />
+    <path
+        android:fillColor="#9CA3AF"
+        android:pathData="M60,48 L73,48 L73,50 L60,50 Z" />
+    <path
+        android:fillColor="#9CA3AF"
+        android:pathData="M60,54 L70,54 L70,56 L60,56 Z" />
+
+    <!-- "W" letter on left page -->
+    <path
+        android:fillColor="#A855F7"
+        android:pathData="M34,60 L38,60 L39,66 L41,62 L43,66 L44,60 L48,60 L46,70 L42,70 L40,64 L38,70 L34,70 Z" />
+
 </vector>

@@ -86,6 +86,8 @@ class WordNotificationService : Service() {
             appendLine(word.meaning)
             appendLine()
             appendLine(word.meaningNP)
+            appendLine()
+            appendLine("\u201C${word.example}\u201D")
         }.trimEnd()
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
@@ -102,9 +104,10 @@ class WordNotificationService : Service() {
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setSilent(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setSortKey("zzz")
             .setWhen(System.currentTimeMillis())
             .build()
     }
