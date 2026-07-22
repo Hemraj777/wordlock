@@ -24,6 +24,15 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".WordOverlayActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WordLock.Overlay"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleInstance"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
         <service
             android:name=".WordNotificationService"
             android:exported="false"

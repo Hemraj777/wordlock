@@ -27,7 +27,7 @@ class WordNotificationService : Service() {
         val notification = buildNotification(word)
         startForeground(NOTIFICATION_ID, notification)
         registerReceivers()
-        Log.d("WordLock", "Service started, foreground notification posted")
+        Log.d("WordLock", "Service started")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -40,11 +40,13 @@ class WordNotificationService : Service() {
         screenReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == Intent.ACTION_SCREEN_ON) {
-                    val word = WordProvider.getRandomWord(context)
-                    val manager = context.getSystemService(NotificationManager::class.java)
-                    val notification = buildNotification(word)
-                    manager.notify(NOTIFICATION_ID, notification)
-                    Log.d("WordLock", "Notification updated: ${word.word}")
+                    val overlayIntent = Intent(context, WordOverlayActivity::class.java)
+                    overlayIntent.addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_NO_ANIMATION
+                    )
+                    context.startActivity(overlayIntent)
+                    Log.d("WordLock", "Overlay launched")
                 }
             }
         }
@@ -147,7 +149,7 @@ class WordNotificationService : Service() {
     }
 
     companion object {
-        const val CHANNEL_ID = "wordlock_v3"
+        const val CHANNEL_ID = "wordlock_v4"
         const val NOTIFICATION_ID = 7777
     }
 }
