@@ -80,6 +80,8 @@ class WordNotificationService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val shortText = "${word.meaning}\n${word.meaningNP}"
+
         val fullText = buildString {
             appendLine(word.meaning)
             appendLine()
@@ -89,7 +91,7 @@ class WordNotificationService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(word.word)
-            .setContentText(word.meaningNP)
+            .setContentText(shortText)
             .setSubText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
             .setStyle(
                 NotificationCompat.BigTextStyle()
