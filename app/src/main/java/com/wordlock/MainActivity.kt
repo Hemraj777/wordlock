@@ -5,10 +5,8 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -23,19 +21,9 @@ class MainActivity : AppCompatActivity() {
     ) { results ->
         val allGranted = results.values.all { it }
         if (allGranted) {
-            checkOverlayAndStart()
-        } else {
-            Toast.makeText(this, "Permissions required for WordLock", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private val overlayPermLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (Settings.canDrawOverlays(this)) {
             startWordService()
         } else {
-            Toast.makeText(this, "Overlay permission required for floating word", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Notification permission required for WordLock to work", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -74,25 +62,12 @@ class MainActivity : AppCompatActivity() {
         if (permsNeeded.isNotEmpty()) {
             permissionLauncher.launch(permsNeeded.toTypedArray())
         } else {
-            checkOverlayAndStart()
-        }
-    }
-
-    private fun checkOverlayAndStart() {
-        if (!Settings.canDrawOverlays(this)) {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName")
-            )
-            overlayPermLauncher.launch(intent)
-            Toast.makeText(this, "Please grant 'Display over other apps' permission", Toast.LENGTH_LONG).show()
-        } else {
             startWordService()
         }
     }
 
     private fun startWordService() {
-        val serviceIntent = Intent(this, WordOverlayService::class.java)
+        val serviceIntent = Intent(this, WordNotificationService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent)
         } else {
@@ -112,17 +87,17 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(
                 this,
-                "Long-press home screen → Widgets → WordLock",
+                "Long-press home screen \u2192 Widgets \u2192 WordLock",
                 Toast.LENGTH_LONG
             ).show()
         }
     }
 
     private fun updateStatusText() {
-        val serviceRunning = isServiceRunning(WordOverlayService::class.java.name)
+        val serviceRunning = isServiceRunning(WordNotificationService::class.java.name)
         val statusText = findViewById<TextView>(R.id.statusText)
         if (serviceRunning) {
-            statusText.text = "Active — floating word on each screen unlock"
+            statusText.text = "Active \u2014 new word on each screen unlock"
             statusText.setTextColor(0xFF4CAF50.toInt())
         } else {
             statusText.text = "Tap the button below to enable"
