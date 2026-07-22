@@ -17,17 +17,36 @@ class MainActivity : AppCompatActivity() {
         refreshWord()
 
         findViewById<Button>(R.id.startOverlayBtn).setOnClickListener {
-            val serviceIntent = Intent(this, WordOverlayService::class.java)
+            val serviceIntent = Intent(this, WordNotificationService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(serviceIntent)
             } else {
                 startService(serviceIntent)
             }
-            Toast.makeText(this, "Overlay started! New word on each screen unlock.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "WordLock enabled! Check your lock screen.", Toast.LENGTH_LONG).show()
         }
 
         findViewById<Button>(R.id.newWordBtn).setOnClickListener {
+            val manager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+            val word = WordProvider.getRandomWord(this)
+            val notification = Notification.Builder(this, WordNotificationService.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(word.word)
+                .setContentText(word.meaningNP)
+                .setStyle(
+                    Notification.BigTextStyle()
+                        .bigText("${word.word}  ${word.pronunciation}\n\n${word.meaning}\n\n${word.meaningNP}")
+                        .setBigContentTitle(word.word)
+                        .setSummaryText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
+                )
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .build()
+            manager.notify(WordNotificationService.NOTIFICATION_ID, notification)
             refreshWord()
+            Toast.makeText(this, "Notification updated!", Toast.LENGTH_SHORT).show()
         }
     }
 
