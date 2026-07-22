@@ -45,6 +45,7 @@ class WordWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widgetPron, word.pronunciation)
             views.setTextViewText(R.id.widgetMeaning, word.meaning)
             views.setTextViewText(R.id.widgetMeaningNP, word.meaningNP)
+            views.setTextViewText(R.id.widgetExample, "\u201C${word.example}\u201D")
 
             val refreshIntent = Intent(context, WordWidgetProvider::class.java).apply {
                 action = ACTION_REFRESH
