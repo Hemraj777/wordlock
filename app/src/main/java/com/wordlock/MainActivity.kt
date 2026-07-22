@@ -1,5 +1,7 @@
 package com.wordlock
 
+import android.app.Notification
+import android.app.NotificationManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -27,26 +29,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.newWordBtn).setOnClickListener {
-            val manager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
-            val word = WordProvider.getRandomWord(this)
-            val notification = Notification.Builder(this, WordNotificationService.CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(word.word)
-                .setContentText(word.meaningNP)
-                .setStyle(
-                    Notification.BigTextStyle()
-                        .bigText("${word.word}  ${word.pronunciation}\n\n${word.meaning}\n\n${word.meaningNP}")
-                        .setBigContentTitle(word.word)
-                        .setSummaryText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
-                )
-                .setOngoing(true)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setCategory(Notification.CATEGORY_MESSAGE)
-                .build()
-            manager.notify(WordNotificationService.NOTIFICATION_ID, notification)
             refreshWord()
-            Toast.makeText(this, "Notification updated!", Toast.LENGTH_SHORT).show()
         }
     }
 
