@@ -80,6 +80,11 @@ class WordNotificationService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val fullScreenIntent = PendingIntent.getActivity(
+            this, 1, launchIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val shortText = "${word.meaning}\n${word.meaningNP}"
 
         val fullText = buildString {
@@ -102,6 +107,7 @@ class WordNotificationService : Service() {
                     .setSummaryText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
             )
             .setContentIntent(pendingIntent)
+            .setFullScreenIntent(fullScreenIntent, true)
             .setOngoing(true)
             .setSilent(true)
             .setPriority(NotificationCompat.PRIORITY_MAX)
