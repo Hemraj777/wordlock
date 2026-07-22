@@ -103,9 +103,9 @@ class WordNotificationService : Service() {
                     .setSummaryText("${word.category.uppercase()} \u2022 New word today")
             )
             .setContentIntent(pendingIntent)
-            .setOngoing(false)
+            .setOngoing(true)
             .setSilent(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setWhen(System.currentTimeMillis())
@@ -116,7 +116,7 @@ class WordNotificationService : Service() {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "WordLock",
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             description = "Shows a new word on your lock screen"
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -141,7 +141,7 @@ class WordNotificationService : Service() {
     }
 
     companion object {
-        const val CHANNEL_ID = "wordlock_words"
+        const val CHANNEL_ID = "wordlock_v2"
         const val NOTIFICATION_ID = 7777
     }
 }
