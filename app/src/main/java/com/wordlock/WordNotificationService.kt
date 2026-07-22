@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat
 class WordNotificationService : Service() {
 
     private var screenReceiver: BroadcastReceiver? = null
+    private var unlockReceiver: BroadcastReceiver? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -25,7 +26,7 @@ class WordNotificationService : Service() {
         val word = WordProvider.getRandomWord(this)
         val notification = buildNotification(word)
         startForeground(NOTIFICATION_ID, notification)
-        registerScreenReceiver()
+        registerReceivers()
         Log.d("WordLock", "Service started, foreground notification posted")
     }
 
@@ -35,7 +36,7 @@ class WordNotificationService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private fun registerScreenReceiver() {
+    private fun registerReceivers() {
         screenReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == Intent.ACTION_SCREEN_ON) {
@@ -43,15 +44,30 @@ class WordNotificationService : Service() {
                     val manager = context.getSystemService(NotificationManager::class.java)
                     val notification = buildNotification(word)
                     manager.notify(NOTIFICATION_ID, notification)
-                    Log.d("WordLock", "Updated notification: ${word.word}")
+                    Log.d("WordLock", "Notification updated: ${word.word}")
                 }
             }
         }
-        val filter = IntentFilter(Intent.ACTION_SCREEN_ON)
+
+        unlockReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == Intent.ACTION_USER_PRESENT) {
+                    val manager = context.getSystemService(NotificationManager::class.java)
+                    manager.cancel(NOTIFICATION_ID)
+                    Log.d("WordLock", "Notification dismissed on unlock")
+                }
+            }
+        }
+
+        val screenFilter = IntentFilter(Intent.ACTION_SCREEN_ON)
+        val unlockFilter = IntentFilter(Intent.ACTION_USER_PRESENT)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(screenReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+            registerReceiver(screenReceiver, screenFilter, Context.RECEIVER_NOT_EXPORTED)
+            registerReceiver(unlockReceiver, unlockFilter, Context.RECEIVER_NOT_EXPORTED)
         } else {
-            registerReceiver(screenReceiver, filter)
+            registerReceiver(screenReceiver, screenFilter)
+            registerReceiver(unlockReceiver, unlockFilter)
         }
     }
 
@@ -63,6 +79,8 @@ class WordNotificationService : Service() {
             this, 0, launchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+
+        val contentText = "${word.meaning}\n${word.meaningNP}"
 
         val fullText = buildString {
             appendLine(word.word)
@@ -76,7 +94,7 @@ class WordNotificationService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(word.word)
-            .setContentText(word.meaningNP)
+            .setContentText(contentText)
             .setSubText(word.category.uppercase())
             .setStyle(
                 NotificationCompat.BigTextStyle()
@@ -85,11 +103,11 @@ class WordNotificationService : Service() {
                     .setSummaryText("${word.category.uppercase()} \u2022 New word today")
             )
             .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setOngoing(false)
+            .setSilent(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-            .setUsesChronometer(false)
             .setWhen(System.currentTimeMillis())
             .build()
     }
@@ -98,13 +116,14 @@ class WordNotificationService : Service() {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "WordLock",
-            NotificationManager.IMPORTANCE_HIGH
+            NotificationManager.IMPORTANCE_LOW
         ).apply {
             description = "Shows a new word on your lock screen"
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             enableVibration(false)
             enableLights(false)
             setShowBadge(true)
+            setSound(null, null)
         }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
@@ -113,6 +132,9 @@ class WordNotificationService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         screenReceiver?.let {
+            try { unregisterReceiver(it) } catch (_: Exception) {}
+        }
+        unlockReceiver?.let {
             try { unregisterReceiver(it) } catch (_: Exception) {}
         }
         Log.d("WordLock", "Service destroyed")
