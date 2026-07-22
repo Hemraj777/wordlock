@@ -24,8 +24,7 @@ class WordNotificationService : Service() {
         Log.d("WordLock", "Service onCreate")
         createNotificationChannel()
         val word = WordProvider.getRandomWord(this)
-        val notification = buildNotification(word)
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(NOTIFICATION_ID, buildNotification(word))
         registerReceivers()
         Log.d("WordLock", "Service started")
     }
@@ -40,13 +39,10 @@ class WordNotificationService : Service() {
         screenReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == Intent.ACTION_SCREEN_ON) {
-                    val overlayIntent = Intent(context, WordOverlayActivity::class.java)
-                    overlayIntent.addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_NO_ANIMATION
-                    )
-                    context.startActivity(overlayIntent)
-                    Log.d("WordLock", "Overlay launched")
+                    val word = WordProvider.getRandomWord(context)
+                    val manager = context.getSystemService(NotificationManager::class.java)
+                    manager.notify(NOTIFICATION_ID, buildOverlayNotification(context, word))
+                    Log.d("WordLock", "Overlay notification posted: ${word.word}")
                 }
             }
         }
@@ -56,7 +52,7 @@ class WordNotificationService : Service() {
                 if (intent.action == Intent.ACTION_USER_PRESENT) {
                     val manager = context.getSystemService(NotificationManager::class.java)
                     manager.cancel(NOTIFICATION_ID)
-                    Log.d("WordLock", "Notification dismissed on unlock")
+                    Log.d("WordLock", "Cancelled on unlock")
                 }
             }
         }
@@ -73,6 +69,42 @@ class WordNotificationService : Service() {
         }
     }
 
+    private fun buildOverlayNotification(context: Context, word: Word): Notification {
+        val overlayIntent = Intent(context, WordOverlayActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_NO_ANIMATION
+        }
+
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            context, System.currentTimeMillis().toInt(), overlayIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val tapIntent = PendingIntent.getActivity(
+            context, 0, overlayIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val shortText = "${word.meaning}\n${word.meaningNP}"
+
+        return NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(word.word)
+            .setContentText(shortText)
+            .setSubText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
+            .setContentIntent(tapIntent)
+            .setFullScreenIntent(fullScreenPendingIntent, true)
+            .setOngoing(true)
+            .setSilent(true)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setSortKey("zzz")
+            .setWhen(System.currentTimeMillis())
+            .build()
+    }
+
     private fun buildNotification(word: Word): Notification {
         val launchIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -82,40 +114,18 @@ class WordNotificationService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val fullScreenIntent = PendingIntent.getActivity(
-            this, 1, launchIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
         val shortText = "${word.meaning}\n${word.meaningNP}"
-
-        val fullText = buildString {
-            appendLine(word.meaning)
-            appendLine()
-            appendLine(word.meaningNP)
-            appendLine()
-            appendLine("\u201C${word.example}\u201D")
-        }.trimEnd()
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(word.word)
-            .setContentText(shortText)
-            .setSubText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
-            .setStyle(
-                NotificationCompat.BigTextStyle()
-                    .bigText(fullText)
-                    .setBigContentTitle(word.word)
-                    .setSummaryText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
-            )
+            .setContentTitle("WordLock Active")
+            .setContentText("New word on each screen unlock")
             .setContentIntent(pendingIntent)
-            .setFullScreenIntent(fullScreenIntent, true)
             .setOngoing(true)
             .setSilent(true)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setSortKey("zzz")
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setWhen(System.currentTimeMillis())
             .build()
     }
@@ -149,7 +159,7 @@ class WordNotificationService : Service() {
     }
 
     companion object {
-        const val CHANNEL_ID = "wordlock_v4"
+        const val CHANNEL_ID = "wordlock_v5"
         const val NOTIFICATION_ID = 7777
     }
 }

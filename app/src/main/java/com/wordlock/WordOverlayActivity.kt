@@ -36,6 +36,10 @@ class WordOverlayActivity : AppCompatActivity() {
             )
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
+        }
+
         setContentView(R.layout.activity_overlay)
 
         val word = WordProvider.getRandomWord(this)
@@ -52,18 +56,18 @@ class WordOverlayActivity : AppCompatActivity() {
             val screenHeight = resources.displayMetrics.heightPixels.toFloat()
             val cardHeight = card.height.toFloat()
 
-            card.translationY = -cardHeight - 100f
+            card.translationY = -cardHeight - 200f
 
             val fallAnimator = ObjectAnimator.ofFloat(
                 card, View.TRANSLATION_Y,
-                -cardHeight - 100f, (screenHeight - cardHeight) / 2f
+                -cardHeight - 200f, (screenHeight - cardHeight) / 2f
             )
             fallAnimator.duration = 1200
             fallAnimator.interpolator = DecelerateInterpolator(1.5f)
 
             fallAnimator.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    handler.postDelayed(autoDismissRunnable, 4000)
+                    handler.postDelayed(autoDismissRunnable, 5000)
                 }
             })
 
