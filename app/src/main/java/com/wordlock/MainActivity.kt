@@ -1,6 +1,8 @@
 package com.wordlock
 
 import android.Manifest
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -45,6 +47,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.startOverlayBtn).setOnClickListener {
             checkPermissionsAndStart()
+        }
+
+        findViewById<Button>(R.id.addWidgetBtn).setOnClickListener {
+            hintAddWidget()
         }
 
         findViewById<Button>(R.id.newWordBtn).setOnClickListener {
@@ -94,6 +100,22 @@ class MainActivity : AppCompatActivity() {
         }
         Toast.makeText(this, "WordLock enabled!", Toast.LENGTH_SHORT).show()
         updateStatusText()
+    }
+
+    private fun hintAddWidget() {
+        val manager = AppWidgetManager.getInstance(this)
+        val widgetProvider = ComponentName(this, WordWidgetProvider::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && manager.isRequestPinAppWidgetSupported) {
+            manager.requestPinAppWidget(widgetProvider, null, null)
+            Toast.makeText(this, "Pin WordLock widget to your home screen", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(
+                this,
+                "Long-press home screen → Widgets → WordLock",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     private fun updateStatusText() {

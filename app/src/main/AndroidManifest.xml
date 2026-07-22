@@ -30,6 +30,18 @@
             android:foregroundServiceType="specialUse" />
 
         <receiver
+            android:name=".WordWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.wordlock.ACTION_REFRESH_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_word_info" />
+        </receiver>
+
+        <receiver
             android:name=".BootReceiver"
             android:exported="true">
             <intent-filter>

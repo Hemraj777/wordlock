@@ -8,57 +8,60 @@
     android:gravity="center">
 
     <TextView
-        android:id="@+id/widgetCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="NOUN"
+        android:text="WORDLOCK"
         android:textColor="#A855F7"
         android:textSize="10sp"
         android:textStyle="bold"
-        android:layout_gravity="center_horizontal" />
+        android:letterSpacing="0.2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/widgetWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Serendipity"
         android:textColor="#FFFFFF"
-        android:textSize="26sp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginTop="8dp"
         android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/widgetPron"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
         android:textColor="#9CA3AF"
         android:textSize="11sp"
         android:layout_marginTop="2dp"
+        android:layout_gravity="center_horizontal" />
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="1dp"
+        android:background="#374151"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/widgetMeaning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
         android:textColor="#D1D5DB"
         android:textSize="12sp"
         android:gravity="center"
-        android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/widgetMeaningNP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
+        android:layout_marginTop="6dp"
         android:textColor="#C084FC"
         android:textSize="12sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginTop="4dp"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

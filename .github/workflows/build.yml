@@ -51,26 +51,29 @@ jobs:
 
     - name: Delete old release if exists
       run: |
-        gh release delete v1.2.0 --yes --cleanup-tag 2>/dev/null || true
+        gh release delete v1.3.0 --yes --cleanup-tag 2>/dev/null || true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v1.2.0
-        name: WordLock v1.2.0
+        tag_name: v1.3.0
+        name: WordLock v1.3.0
         body: |
-          # WordLock v1.2.0
+          # WordLock v1.3.0
           
-          Persistent lock screen notification — shows a new English word with Nepali meaning each time you wake your screen.
+          New: Home screen widget + lock screen overlay.
           
-          ## How it works
-          1. Install the APK
-          2. Open WordLock → tap "Enable WordLock"
-          3. Grant notification permission when asked
-          4. A notification with a new word appears on your lock screen every time you unlock
-          5. The notification updates with a new random word on each screen wake
+          ## Features
+          - **Lock screen overlay** — floating paper with word on each unlock
+          - **Home screen widget** — shows word, updates every 5 minutes, tap to refresh
+          - **1011 words** with English + Nepali meanings
+          
+          ## Widget
+          1. Long-press home screen → Widgets → WordLock
+          2. Or tap "Add Widget to Home Screen" in the app
+          3. Tap the widget to get a new word
         files: app/build/outputs/apk/release/app-release.apk
         draft: false
         prerelease: false

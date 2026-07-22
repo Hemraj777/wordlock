@@ -63,6 +63,17 @@
         android:textSize="16sp" />
 
     <Button
+        android:id="@+id/addWidgetBtn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/btn_outline"
+        android:text="Add Widget to Home Screen"
+        android:textAllCaps="false"
+        android:textColor="#e8e8ed"
+        android:textSize="16sp" />
+
+    <Button
         android:id="@+id/newWordBtn"
         android:layout_width="match_parent"
         android:layout_height="56dp"

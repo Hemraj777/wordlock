@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WordLock</string>
-    <string name="overlay_description">Shows a new English word each time you unlock your screen.</string>
+    <string name="overlay_description">Shows a new word on your lock screen</string>
+    <string name="widget_description">A new English word on your home screen, updated every 5 minutes. Tap to refresh.</string>
 </resources>
