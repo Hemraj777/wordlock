@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center">
+    android:gravity="center"
+    android:background="@drawable/widget_background">
 
     <TextView
         android:layout_width="wrap_content"
@@ -15,13 +16,24 @@
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/widgetCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#F9A8D4"
+        android:textSize="9sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="6dp" />
 
     <TextView
         android:id="@+id/widgetWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#F43F5E"
+        android:textColor="#00E5FF"
         android:textSize="26sp"
         android:textStyle="bold"
         android:fontFamily="serif"
@@ -41,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="───────────────"
-        android:textColor="#334155"
+        android:textColor="#55FFFFFF"
         android:textSize="10sp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -61,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textColor="#C084FC"
+        android:textColor="#E9D5FF"
         android:textSize="12sp"
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium"
@@ -71,7 +83,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="───────────────"
-        android:textColor="#334155"
+        android:textColor="#55FFFFFF"
         android:textSize="10sp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"

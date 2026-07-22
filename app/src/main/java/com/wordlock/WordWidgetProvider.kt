@@ -42,6 +42,7 @@ class WordWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_word)
 
             views.setTextViewText(R.id.widgetWord, word.word)
+            views.setTextViewText(R.id.widgetCategory, word.category.uppercase())
             views.setTextViewText(R.id.widgetPron, word.pronunciation)
             views.setTextViewText(R.id.widgetMeaning, word.meaning)
             views.setTextViewText(R.id.widgetMeaningNP, word.meaningNP)
