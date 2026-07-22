@@ -42,13 +42,22 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Tap the button below to enable"
+        android:textColor="#9CA3AF"
+        android:textSize="13sp" />
+
     <Button
         android:id="@+id/startOverlayBtn"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/btn_primary"
-        android:text="Start Word Overlay"
+        android:text="Enable WordLock"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16sp" />

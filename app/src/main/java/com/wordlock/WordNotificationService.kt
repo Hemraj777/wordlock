@@ -3,6 +3,7 @@ package com.wordlock
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,6 +12,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.core.app.NotificationCompat
 
 class WordNotificationService : Service() {
 
@@ -18,11 +20,17 @@ class WordNotificationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Log.d("WordLock", "Service onCreate")
         createNotificationChannel()
         val word = WordProvider.getRandomWord(this)
-        startForeground(NOTIFICATION_ID, buildNotification(word))
+        val notification = buildNotification(word)
+        startForeground(NOTIFICATION_ID, notification)
         registerScreenReceiver()
-        Log.d("WordLock", "Service started")
+        Log.d("WordLock", "Service started, foreground notification posted")
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -32,9 +40,10 @@ class WordNotificationService : Service() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == Intent.ACTION_SCREEN_ON) {
                     val word = WordProvider.getRandomWord(context)
-                    val manager = getSystemService(NotificationManager::class.java)
-                    manager.notify(NOTIFICATION_ID, buildNotification(word))
-                    Log.d("WordLock", "Updated word: ${word.word}")
+                    val manager = context.getSystemService(NotificationManager::class.java)
+                    val notification = buildNotification(word)
+                    manager.notify(NOTIFICATION_ID, notification)
+                    Log.d("WordLock", "Updated notification: ${word.word}")
                 }
             }
         }
@@ -47,22 +56,41 @@ class WordNotificationService : Service() {
     }
 
     private fun buildNotification(word: Word): Notification {
-        val fullText = "${word.word}  ${word.pronunciation}\n\n${word.meaning}\n\n${word.meaningNP}"
+        val launchIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, launchIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
-        return Notification.Builder(this, CHANNEL_ID)
+        val fullText = buildString {
+            appendLine(word.word)
+            appendLine(word.pronunciation)
+            appendLine()
+            appendLine(word.meaning)
+            appendLine()
+            appendLine(word.meaningNP)
+        }.trimEnd()
+
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(word.word)
             .setContentText(word.meaningNP)
+            .setSubText(word.category.uppercase())
             .setStyle(
-                Notification.BigTextStyle()
+                NotificationCompat.BigTextStyle()
                     .bigText(fullText)
-                    .setBigContentTitle(word.word)
-                    .setSummaryText("${word.category.uppercase()} \u2022 ${word.pronunciation}")
+                    .setBigContentTitle("${word.word}  ${word.pronunciation}")
+                    .setSummaryText("${word.category.uppercase()} \u2022 New word today")
             )
+            .setContentIntent(pendingIntent)
             .setOngoing(true)
-            .setPriority(Notification.PRIORITY_HIGH)
-            .setVisibility(Notification.VISIBILITY_PUBLIC)
-            .setCategory(Notification.CATEGORY_MESSAGE)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setUsesChronometer(false)
+            .setWhen(System.currentTimeMillis())
             .build()
     }
 
@@ -72,7 +100,7 @@ class WordNotificationService : Service() {
             "WordLock",
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Daily word on lock screen"
+            description = "Shows a new word on your lock screen"
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             enableVibration(false)
             enableLights(false)
@@ -87,6 +115,7 @@ class WordNotificationService : Service() {
         screenReceiver?.let {
             try { unregisterReceiver(it) } catch (_: Exception) {}
         }
+        Log.d("WordLock", "Service destroyed")
     }
 
     companion object {

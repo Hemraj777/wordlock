@@ -1,16 +1,29 @@
 package com.wordlock
 
-import android.app.Notification
-import android.app.NotificationManager
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
+
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        val allGranted = results.values.all { it }
+        if (allGranted) {
+            startWordService()
+        } else {
+            Toast.makeText(this, "Notification permission required for WordLock to work", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,18 +32,64 @@ class MainActivity : AppCompatActivity() {
         refreshWord()
 
         findViewById<Button>(R.id.startOverlayBtn).setOnClickListener {
-            val serviceIntent = Intent(this, WordNotificationService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent)
-            } else {
-                startService(serviceIntent)
-            }
-            Toast.makeText(this, "WordLock enabled! Check your lock screen.", Toast.LENGTH_LONG).show()
+            checkPermissionsAndStart()
         }
 
         findViewById<Button>(R.id.newWordBtn).setOnClickListener {
             refreshWord()
         }
+
+        updateStatusText()
+    }
+
+    private fun checkPermissionsAndStart() {
+        val permsNeeded = mutableListOf<String>()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                permsNeeded.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        if (permsNeeded.isNotEmpty()) {
+            permissionLauncher.launch(permsNeeded.toTypedArray())
+        } else {
+            startWordService()
+        }
+    }
+
+    private fun startWordService() {
+        val serviceIntent = Intent(this, WordNotificationService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+        Toast.makeText(this, "WordLock enabled!", Toast.LENGTH_SHORT).show()
+        updateStatusText()
+    }
+
+    private fun updateStatusText() {
+        val serviceRunning = isServiceRunning(WordNotificationService::class.java.name)
+        val statusText = findViewById<TextView>(R.id.statusText)
+        if (serviceRunning) {
+            statusText.text = "Active — new word on each screen unlock"
+            statusText.setTextColor(0xFF4CAF50.toInt())
+        } else {
+            statusText.text = "Tap the button below to enable"
+            statusText.setTextColor(0xFF9CA3AF.toInt())
+        }
+    }
+
+    private fun isServiceRunning(serviceName: String): Boolean {
+        val manager = getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager
+        @Suppress("DEPRECATION")
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceName == service.service.className) return true
+        }
+        return false
     }
 
     private fun refreshWord() {
@@ -43,5 +102,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         refreshWord()
+        updateStatusText()
     }
 }
